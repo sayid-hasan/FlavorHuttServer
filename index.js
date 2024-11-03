@@ -29,6 +29,25 @@ async function run() {
     await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
+    //
+    //   jwt authentication
+
+    // database of foooditemsCollection
+    const foodItemsCollection = client
+      .db("flavorHuttDb")
+      .collection("foodItems");
+
+    //   get top 6 based on purchaseCount to show in Home page
+    app.get("/top-selling", async (req, res) => {
+      // Fetch the top 6 selling food items based on purchaseCount
+      const topSellingItems = await foodItemsCollection
+        .find()
+        .sort({ purchaseCount: -1 }) // Sort by purchaseCount in descending order
+        .limit(6) // Limit to 6 results
+        .toArray();
+
+      res.send(topSellingItems);
+    });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
