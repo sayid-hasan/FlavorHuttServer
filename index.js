@@ -36,7 +36,8 @@ async function run() {
     const foodItemsCollection = client
       .db("flavorHuttDb")
       .collection("foodItems");
-
+    //   collection of reviews
+    const reviewsCollection = client.db("flavorHuttDb").collection("reviews");
     //   get top 6 based on purchaseCount to show in Home page
     app.get("/top-selling", async (req, res) => {
       // Fetch the top 6 selling food items based on purchaseCount
@@ -47,6 +48,15 @@ async function run() {
         .toArray();
 
       res.send(topSellingItems);
+    });
+    //   get top rated reviews
+    app.get("/reviews", async (req, res) => {
+      // Fetch the top 6 selling food items based on purchaseCount
+      const topRatedReviews = await reviewsCollection
+        .find({ starRating: { $gte: 4 } })
+        .toArray();
+
+      res.send(topRatedReviews);
     });
 
     console.log(
