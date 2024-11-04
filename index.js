@@ -49,6 +49,15 @@ async function run() {
 
       res.send(topSellingItems);
     });
+
+    // get data of single dish for foodItemDetails page
+    app.get("/allFoods/:id", async (req, res) => {
+      const { id } = req?.params;
+      const foodItem = await foodItemsCollection.findOne({
+        _id: new ObjectId(id),
+      });
+      res.send(foodItem);
+    });
     //   get top rated reviews
     app.get("/reviews", async (req, res) => {
       // Fetch the top 6 selling food items based on purchaseCount
