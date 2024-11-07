@@ -38,6 +38,7 @@ async function run() {
       .collection("foodItems");
     //   collection of reviews
     const reviewsCollection = client.db("flavorHuttDb").collection("reviews");
+    const sellsColection = client.db("flavorHuttDb").collection("sells");
     //   get top 6 based on purchaseCount to show in Home page
     app.get("/top-selling", async (req, res) => {
       // Fetch the top 6 selling food items based on purchaseCount
@@ -58,6 +59,35 @@ async function run() {
       });
       res.send(foodItem);
     });
+    // get data of every single dish for allFood page
+    app.get("/allFoods", async (req, res) => {
+      const foodItem = await foodItemsCollection.find().toArray();
+      res.send(foodItem);
+    });
+
+    // get purchase data and update food stock and purchaseCount accordingly
+    app.post("/purchaseHistory", async (req, res) => {
+      const { food, quantity, buyerEmail } = req?.body;
+      // Update the purchase count and stock using MongoDB's `$inc` operator
+      const result = await foodItemsCollection.updateOne(
+        {
+          foodName: food,
+        },
+        {
+          $inc: { purchaseCount: quantity, stock: -quantity },
+        }
+      );
+      // Check if the item exists and was updated
+      if (result.matchedCount === 0) {
+        return res
+          .status(404)
+          .send({ success: false, message: "Item not found" });
+      }
+      // Insert purchase record into `sellsColection`
+      await sellsColection.insertOne(req.body);
+      res.send(result);
+    });
+
     //   get top rated reviews
     app.get("/reviews", async (req, res) => {
       // Fetch the top 6 selling food items based on purchaseCount
