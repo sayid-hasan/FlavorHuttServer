@@ -61,8 +61,23 @@ async function run() {
     });
     // get data of every single dish for allFood page
     app.get("/allFoods", async (req, res) => {
-      const foodItem = await foodItemsCollection.find().toArray();
-      res.send(foodItem);
+      const { query } = req?.query;
+      console.log("all food api", query);
+      let filter = {}; // Initialize filter as an empty object
+
+      if (query && query !== "") {
+        // Ensure query is not empty or undefined
+        // Use the query parameter for the regex search on foodName
+        filter = {
+          foodName: { $regex: query, $options: "i" }, // case-insensitive search
+        };
+        console.log("all food api filter:", filter); // Log the filter object
+      } else {
+        filter = {}; // Log if no query is provided
+      }
+      console.log("all food api filter", filter);
+      const foodItems = await foodItemsCollection.find(filter).toArray();
+      res.send(foodItems);
     });
 
     // get purchase data and update food stock and purchaseCount accordingly
@@ -77,6 +92,7 @@ async function run() {
           $inc: { purchaseCount: quantity, stock: -quantity },
         }
       );
+
       // Check if the item exists and was updated
       if (result.matchedCount === 0) {
         return res
