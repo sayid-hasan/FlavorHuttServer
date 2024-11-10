@@ -54,6 +54,13 @@ async function run() {
       res.send(topSellingItems);
     });
 
+    app.post("/allFoods", async (req, res) => {
+      const foodData = req?.body;
+      // console.log("post api ", foodData);
+      const result = await foodItemsCollection.insertOne(foodData);
+      res.send(result);
+    });
+
     // get data of single dish for foodItemDetails page
     app.get("/allFoods/:id", async (req, res) => {
       const { id } = req?.params;
