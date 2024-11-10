@@ -60,6 +60,14 @@ async function run() {
       const result = await foodItemsCollection.insertOne(foodData);
       res.send(result);
     });
+    // get food items  by email address
+    app.get("/allFoods/:email", async (req, res) => {
+      const { email } = req?.params;
+      const foodItems = await foodItemsCollection
+        .find({ "addedBy.email": email })
+        .toArray();
+      res.send(foodItems);
+    });
 
     // get data of single dish for foodItemDetails page
     app.get("/allFoods/:id", async (req, res) => {
