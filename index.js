@@ -63,14 +63,26 @@ async function run() {
     // get food items  by email address
     app.get("/allFoods/:email", async (req, res) => {
       const { email } = req?.params;
+      console.log(req?.params);
       const foodItems = await foodItemsCollection
         .find({ "addedBy.email": email })
         .toArray();
       res.send(foodItems);
     });
 
+    // update a single dish
+    app.put("/updateFood/:id", async (req, res) => {
+      const { id } = req?.params;
+      const updatedData = req?.body;
+      console.log(id, updatedData);
+      const result = await foodItemsCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedData }
+      );
+      res.send(result);
+    });
     // get data of single dish for foodItemDetails page
-    app.get("/allFoods/:id", async (req, res) => {
+    app.put("/allFoods/:id", async (req, res) => {
       const { id } = req?.params;
       const foodItem = await foodItemsCollection.findOne({
         _id: new ObjectId(id),
