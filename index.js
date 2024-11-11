@@ -26,9 +26,9 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.connect();
+    // // Send a ping to confirm a successful connection
+    // await client.db("admin").command({ ping: 1 });
     //
     //   jwt authentication
 
@@ -81,14 +81,7 @@ async function run() {
       );
       res.send(result);
     });
-    // get data of single dish for foodItemDetails page
-    app.put("/allFoods/:id", async (req, res) => {
-      const { id } = req?.params;
-      const foodItem = await foodItemsCollection.findOne({
-        _id: new ObjectId(id),
-      });
-      res.send(foodItem);
-    });
+
     // get data of every single dish for allFood page
     app.get("/allFoods", async (req, res) => {
       const { query } = req?.query;
@@ -108,6 +101,16 @@ async function run() {
       console.log("all food api filter", filter);
       const foodItems = await foodItemsCollection.find(filter).toArray();
       res.send(foodItems);
+    });
+    // get data of single dish for foodItemDetails page
+    app.get("/allFoodItems/:id", async (req, res) => {
+      const { id } = req?.params;
+      console.log("detailsPage", id);
+      const foodItem = await foodItemsCollection.findOne({
+        _id: new ObjectId(id),
+      });
+
+      res.send(foodItem);
     });
 
     // get purchase data and update food stock and purchaseCount accordingly
@@ -142,6 +145,14 @@ async function run() {
         .toArray();
 
       res.send(topRatedReviews);
+    });
+
+    app.post("/feedback", async (req, res) => {
+      const feedbackData = req?.body;
+
+      console.log("post api ", feedbackData);
+      const result = await feedbacksColection.insertOne(feedbackData);
+      res.send(result);
     });
     //   Gallery page api ..get all feed backs
     app.get("/feedbacks", async (req, res) => {
